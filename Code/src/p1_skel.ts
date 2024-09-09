@@ -497,7 +497,7 @@ class FittsTestUI extends UIClass {
         // Be a bit tolerant of variant forms...
         newState = newState.toLowerCase();
         newState = newState.replace('-','_');
-
+        // get mouse clicked location
         this.currentState = newState;
         switch (this.currentState) {
             case 'start':
@@ -506,45 +506,37 @@ class FittsTestUI extends UIClass {
                     "  For each trial click the center of the blue target to begin";
                 this.theBackground.msg3 = 
                     "  Then click inside the green circle that appears";
-                this.theReticle.visible = false;
-                
+                this.theReticle.visible = false; 
+                this.theTarget.visible = false;
 
-                // this.startTime
+                // if (this.handleClick(0,0)){
+                //     this.theReticle.visible = true;
+                //     this.currentState = "begin_trial"
+                // }
 
-                // a bit more left to do...
-                // === YOUR CODE HERE ===
-
+                // if (this.theBackground.handleClickAt(event.clientX,event.clientX)){
+                //     this.theReticle.visible = true;
+                //     this.currentState = "begin_trial"
+                // }
             break;
             case 'begin_trial':
+                this.theTarget.visible = false; 
                 this.theReticle.visible = true;
-                this.theBackground.msg4 = `Trial #${this.trialCount} of 10`
-                // this.theReticle
-                // === YOUR CODE HERE ===
-                if (this.theReticle.handleClickAt(1,4)){
-                    this.theReticle.visible = false;
-                    this.theTarget.visible = true;
-                    this.currentState = "in_trial"
-                    this.newTrial() // start new trial
-                }
-
+                this.theBackground.msg4 = `Trial #${this.trialCount} of ${this.MAX_TRIALS}`;
         
             break;
             case 'in_trial':
-                
+                this.theReticle.visible = false; 
                 this.theTarget.visible = true; 
-                // === YOUR CODE HERE ===
-                if (this.theTarget.handleClickAt(1,2)){
-                    this.theTarget.visible = false;
-                    this.theReticle.visible = true
-                    this.currentState = "begin_trial"
-                }
                 
         
             break;
             case 'ended':
                 
                 // === YOUR CODE HERE ===
-        
+                this.theReticle.visible = false; 
+                this.theTarget.visible = false; 
+                this.theBackground.msg5 = "Done! Refresh the page to start again :)"
                 // produce a dump of our data records on the console
                 this.presentData();
             break;
@@ -708,6 +700,13 @@ class Target extends ScreenObject{
     // and starting a new one.
     override handleClickAt(ptX : number, ptY : number) : boolean {
         
+                // Random shit from before W
+                // if (this.theTarget.handleClickAt(1,2)){
+                //     this.theTarget.visible = false;
+                //     this.theReticle.visible = true
+                //     this.currentState = "begin_trial"
+                // }
+
         // === YOUR CODE HERE ===
         
         // === REMOVE THE FOLLOWING CODE (which is here so the skeleton code compiles) ===
@@ -778,9 +777,17 @@ class Reticle extends Target {
     // expect to be in the 'begin_trial' interface state and will respond 
     // by starting the trial timer and moving to the 'in_trial' state.
     override handleClickAt(ptX : number, ptY : number) : boolean {
-        
+        // this.theReticle.visible = false;
+        // this.theTarget.visible = true;
+        // this.currentState = "in_trial"
+        // this.newTrial() // start new trial
+
         // === YOUR CODE HERE ===
-        
+
+        // return true if mouse is clicked withing the reticle center, 
+        // false otherwise
+
+
         // === REMOVE THE FOLLOWING CODE (which is here so the skeleton code compiles) ===
         return false;
         // === END OF CODE TO BE REMOVED ===
@@ -818,6 +825,10 @@ class BackgroundDisplay extends ScreenObject{
     protected _msg4: string;
     get msg4() : string {return this._msg4;}
     set msg4(v : string) {this._msg4 = v; this.declareDamaged()}
+
+    protected _msg5: string;
+    get msg5() : string {return this._msg4;}
+    set msg5(v : string) {this._msg4 = v; this.declareDamaged()}
     // . . . . . . . . . . . .  . . . . . . . . . . . . . . . . . . . . . . 
 
     constructor(w : number, h : number, parent : FittsTestUI) {
@@ -827,6 +838,7 @@ class BackgroundDisplay extends ScreenObject{
         this._msg2 = "";
         this._msg3 = "";
         this._msg4 = "";
+        this._msg5 = "";
         this._parentUI = parent;
     }
  
@@ -849,6 +861,19 @@ class BackgroundDisplay extends ScreenObject{
         let xpos : number = 10;
 
         // === YOUR CODE HERE ===
+        if (this.parentUI.currentState === 'start'){
+            ctx.fillText(this.msg1, xpos, ypos);
+            ctx.fillText(this.msg2, xpos,2*ypos);
+            ctx.fillText(this.msg3, xpos, 3*ypos);
+        } else if (this.parentUI.currentState === 'begin_trial'){
+            ctx.fillText(this.msg4, xpos, ypos);
+
+        }else if (this.parentUI.currentState === 'ended') {
+            // ctx.fillText(this.msg5, xpos, ypos);
+        }
+        
+        
+        
     }
 
     // . . . . . . . . . . . .  . . . . . . . . . . . . . . . . . . . . . . 
@@ -856,10 +881,13 @@ class BackgroundDisplay extends ScreenObject{
     // Handle click input.  The interface should be in the 'start' state,
     // in which case we respond to this input by starting a new trial
     override handleClickAt(ptX : number, ptY : number) : boolean {
-        
-        // === YOUR CODE HERE ===
-        
-        // === REMOVE THE FOLLOWING CODE (which is here so the skeleton code compiles) ===
+        // if mouse is clicked and state is start then change it to 
+        if (this.parentUI.currentState === 'start'){
+            this.parentUI.theReticle.visible = true;
+            this.parentUI.configure('begin_trial');
+            return true;
+        }
+
         return false;
         // === END OF CODE TO BE REMOVED ===
     }
