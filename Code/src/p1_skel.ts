@@ -509,15 +509,6 @@ class FittsTestUI extends UIClass {
                 this.theReticle.visible = false; 
                 this.theTarget.visible = false;
 
-                // if (this.handleClick(0,0)){
-                //     this.theReticle.visible = true;
-                //     this.currentState = "begin_trial"
-                // }
-
-                // if (this.theBackground.handleClickAt(event.clientX,event.clientX)){
-                //     this.theReticle.visible = true;
-                //     this.currentState = "begin_trial"
-                // }
             break;
             case 'begin_trial':
                 this.theTarget.visible = false; 
@@ -565,6 +556,7 @@ class FittsTestUI extends UIClass {
             // make new random locations for reticle and target 
             const {retX:retX, retY:retY, targX:targX, targY:targY, targD:targDiam} = 
                 pickLocationsAndSize(this.canvas.width,this.canvas.height);
+                this.configure("in_trial")
 
             // === YOUR CODE HERE ===
         }
