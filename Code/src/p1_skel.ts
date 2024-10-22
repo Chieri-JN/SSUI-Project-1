@@ -559,6 +559,11 @@ class FittsTestUI extends UIClass {
                 this.configure("in_trial")
 
             // === YOUR CODE HERE ===
+            // set locations for recticle and target
+            this.childObjects.push(this._theReticle = new Reticle(retX, retY, this));
+            this.childObjects.push(this._theTarget = new Target(targX, targY, targDiam, this));
+            this.configure("begin_trial");
+
         }
     }
 
@@ -646,6 +651,14 @@ class Target extends ScreenObject{
     newGeom(newCentX : number, newCentY : number, newDiam? : number) {
         
         // === YOUR CODE HERE ===
+        if(typeof newDiam === 'number'){
+            this._w = newDiam;
+            this._h = newDiam;
+        }
+        this.centerX = newCentX;
+        this.centerY = newCentY;
+            // this._x = newCentX;
+            // this._y = newCentY;
         
         this.declareDamaged();
     }
@@ -670,6 +683,9 @@ class Target extends ScreenObject{
     override draw(ctx : CanvasRenderingContext2D) : void {
         
         // === YOUR CODE HERE ===
+        ctx.fillStyle = this.color;
+        ctx.strokeStyle = 'black';
+        ctx.ellipse(this.centerX, this.centerY, this.radius, this.radius, 0, 0, 360);
         
     }
 
@@ -679,9 +695,17 @@ class Target extends ScreenObject{
     override pickedBy(ptX : number, ptY : number) : boolean {
         
         // === YOUR CODE HERE ===
-        
-        // === REMOVE THE FOLLOWING CODE (which is here so the skeleton code compiles) ===
+        // want to see if point is within circle radius
+        // compare areas? look at area created from click point
+        // const A = Math.PI * 2 *  Math.pow(this.radius, 2);
+        // const B = Math.PI * 2 *  Math.pow(this.radius, 2);
+        if ((ptX > this.centerX - this.radius) && (ptX < this.centerX + this.radius) &&
+            (ptY > this.centerY - this.radius) && (ptY < this.centerY + this.radius)){
+                return true;
+            }
         return false;
+        // === REMOVE THE FOLLOWING CODE (which is here so the skeleton code compiles) ===
+       
         // === END OF CODE TO BE REMOVED ===
     }
 
@@ -700,7 +724,10 @@ class Target extends ScreenObject{
                 // }
 
         // === YOUR CODE HERE ===
-        
+        if ((this._parentUI.currentState === 'in_trial') && (this.pickedBy(ptX, ptY))){
+            this._parentUI.configure("begin_trial")
+            return true;
+        }
         // === REMOVE THE FOLLOWING CODE (which is here so the skeleton code compiles) ===
         return false;
         // === END OF CODE TO BE REMOVED ===
@@ -820,7 +847,7 @@ class BackgroundDisplay extends ScreenObject{
 
     protected _msg5: string;
     get msg5() : string {return this._msg4;}
-    set msg5(v : string) {this._msg4 = v; this.declareDamaged()}
+    set msg5(v : string) {this._msg5 = v; this.declareDamaged()}
     // . . . . . . . . . . . .  . . . . . . . . . . . . . . . . . . . . . . 
 
     constructor(w : number, h : number, parent : FittsTestUI) {
